@@ -1,0 +1,20 @@
+{
+  "name": "cami-ciudad-del-carmen",
+  "version": "1.0.0",
+  "description": "Asistente virtual de rutas en Ciudad del Carmen con IA Gemma 4, voz interactiva y clima en tiempo real.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "ciudad-del-carmen",
+    "campeche",
+    "gemma4",
+    "leaflet",
+    "voice-assistant",
+    "weather",
+    "open-meteo"
+  ],
+  "author": "Miguel Jimenez",
+  "license": "MIT"
+}

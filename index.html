@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cami - Tu Asistente Virtual de Rutas en Ciudad del Carmen</title>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <!-- Estilos Personalizados Cami -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       TOP NAVBAR (Diseño Idéntico a Imagen 2 con Logo de Camarón de Imagen 3)
+       ========================================================================= -->
+  <header class="cami-navbar">
+    <div class="brand-section">
+      <div class="brand-logo-container" title="Cami - Mascota Camarón de Ciudad del Carmen">
+        <img src="assets/cami-logo.jpg" alt="Logo Cami" class="brand-logo-img">
+      </div>
+      <div class="brand-title-wrap">
+        <h1 class="brand-name">Cami</h1>
+        <span class="brand-tagline">Tu asistente virtual de rutas en Ciudad del Carmen</span>
+      </div>
+    </div>
+
+    <!-- Menú de Navegación -->
+    <nav>
+      <ul class="nav-links-menu">
+        <li class="nav-link-item active"><a href="#inicio"><i class="fa-solid fa-house"></i> Inicio</a></li>
+        <li class="nav-link-item"><a href="#explorar"><i class="fa-solid fa-compass"></i> Explorar</a></li>
+        <li class="nav-link-item"><a href="#favoritos"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
+        <li class="nav-link-item"><a href="#rutas"><i class="fa-solid fa-route"></i> Rutas</a></li>
+      </ul>
+    </nav>
+
+    <!-- Herramientas y Acciones Derecha -->
+    <div class="nav-actions-right">
+      <button class="action-icon-btn btn-mic-pulse" id="btn-voice-command" title="Hablar con Cami (Comandos de voz)">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+
+      <button class="action-icon-btn" id="btn-gemma-settings" title="Configurar API de Gemma 4 / Ollama">
+        <i class="fa-solid fa-brain"></i>
+      </button>
+
+      <button class="action-icon-btn" id="btn-open-chat" title="Abrir Chatbot Cami">
+        <i class="fa-solid fa-robot"></i>
+      </button>
+
+      <div class="user-avatar-badge" title="Perfil de Explorador">
+        <i class="fa-solid fa-user"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       LAYOUT PRINCIPAL: SIDEBAR + MAPA CENTRAL + PANEL INFERIOR DERECHO
+       ========================================================================= -->
+  <main class="app-main-layout">
+
+    <!-- SIDEBAR IZQUIERDO (Estilo Imagen 2) -->
+    <aside class="sidebar-left-panel">
+
+      <!-- Widget Superior: Clima en Tiempo Real -->
+      <div class="weather-sidebar-card">
+        <div class="weather-header-row">
+          <span class="weather-city-label"><i class="fa-solid fa-location-dot"></i> Ciudad del Carmen</span>
+          <button class="btn-icon-subtle btn-refresh-weather" title="Actualizar clima en tiempo real">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+
+        <div class="weather-main-display">
+          <div class="weather-icon-wrap">
+            <i class="fa-solid fa-cloud-sun weather-main-icon" id="sidebar-weather-icon"></i>
+          </div>
+          <div class="weather-temp-info">
+            <span class="weather-big-temp" id="sidebar-weather-temp">31°</span>
+            <span class="weather-condition-text" id="sidebar-weather-desc">Parcialmente nublado</span>
+            <span class="weather-minmax-text" id="sidebar-weather-minmax">↑ 33° ↓ 26°</span>
+          </div>
+        </div>
+
+        <!-- Píldora de Recomendación de Salud (Requisito Explícito) -->
+        <div class="sidebar-health-container" id="sidebar-health-recommendation">
+          <div class="health-alert-pill health-pill-warning">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span class="health-pill-title">Usar bloqueador solar FPS 50+</span>
+          </div>
+        </div>
+
+        <!-- Pronóstico Horario de Imagen 2 -->
+        <div class="sidebar-hourly-row" id="sidebar-hourly-forecast">
+          <!-- Inyectado dinámicamente con JavaScript -->
+          <div class="hourly-mini-item">
+            <span class="hour-time">4 PM</span>
+            <i class="fa-solid fa-cloud-sun hour-icon"></i>
+            <span class="hour-temp">31°</span>
+          </div>
+          <div class="hourly-mini-item">
+            <span class="hour-time">5 PM</span>
+            <i class="fa-solid fa-cloud-sun hour-icon"></i>
+            <span class="hour-temp">30°</span>
+          </div>
+          <div class="hourly-mini-item">
+            <span class="hour-time">6 PM</span>
+            <i class="fa-solid fa-sun hour-icon"></i>
+            <span class="hour-temp">29°</span>
+          </div>
+          <div class="hourly-mini-item">
+            <span class="hour-time">7 PM</span>
+            <i class="fa-solid fa-sun hour-icon"></i>
+            <span class="hour-temp">28°</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget Inferior: Explora la Ciudad -->
+      <div class="explore-section-card">
+        <div class="section-title-wrap">
+          <h2 class="section-title"><i class="fa-solid fa-compass"></i> Explora la ciudad</h2>
+          <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem; color: var(--text-dim);"></i>
+        </div>
+
+        <div class="nav-categories-list">
+          <div class="nav-category-item active" data-cat="playas">
+            <div class="cat-item-left">
+              <div class="cat-icon-badge" style="background: rgba(255, 183, 3, 0.15); color: #ffb703;">
+                <i class="fa-solid fa-umbrella-beach"></i>
+              </div>
+              <span class="cat-name-label">Playas</span>
+            </div>
+            <i class="fa-solid fa-chevron-right cat-chevron"></i>
+          </div>
+
+          <div class="nav-category-item" data-cat="gastronomia">
+            <div class="cat-item-left">
+              <div class="cat-icon-badge" style="background: rgba(251, 133, 0, 0.15); color: #fb8500;">
+                <i class="fa-solid fa-utensils"></i>
+              </div>
+              <span class="cat-name-label">Gastronomía</span>
+            </div>
+            <i class="fa-solid fa-chevron-right cat-chevron"></i>
+          </div>
+
+          <div class="nav-category-item" data-cat="cultura">
+            <div class="cat-item-left">
+              <div class="cat-icon-badge" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+                <i class="fa-solid fa-landmark"></i>
+              </div>
+              <span class="cat-name-label">Cultura e historia</span>
+            </div>
+            <i class="fa-solid fa-chevron-right cat-chevron"></i>
+          </div>
+
+          <div class="nav-category-item" data-cat="naturaleza">
+            <div class="cat-item-left">
+              <div class="cat-icon-badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">
+                <i class="fa-solid fa-leaf"></i>
+              </div>
+              <span class="cat-name-label">Naturaleza</span>
+            </div>
+            <i class="fa-solid fa-chevron-right cat-chevron"></i>
+          </div>
+
+          <div class="nav-category-item" data-cat="eventos">
+            <div class="cat-item-left">
+              <div class="cat-icon-badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                <i class="fa-solid fa-calendar-days"></i>
+              </div>
+              <span class="cat-name-label">Eventos</span>
+            </div>
+            <i class="fa-solid fa-chevron-right cat-chevron"></i>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAPA CENTRAL INTERACTIVO DE CIUDAD DEL CARMEN -->
+    <section class="map-container-wrapper">
+      <div id="carmen-map"></div>
+
+      <!-- Controles Flotantes del Mapa -->
+      <div class="floating-map-controls">
+        <button class="map-floating-btn" id="btn-gps-locate" title="Ubicarme en tiempo real con GPS">
+          <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+      </div>
+
+      <!-- Selector Visual de Capas del Mapa -->
+      <div class="map-layer-selector-bar">
+        <button class="layer-pill-btn active" data-layer="voyager" title="Muestra naturaleza verde, manglares, playas doradas y aguas azuladas">
+          <i class="fa-solid fa-leaf" style="color: #22c55e;"></i> Naturaleza & Turismo
+        </button>
+        <button class="layer-pill-btn" data-layer="satellite" title="Fotografía satelital real de la isla y mar">
+          <i class="fa-solid fa-satellite" style="color: #38bdf8;"></i> Satélite Real
+        </button>
+        <button class="layer-pill-btn" data-layer="topo" title="Relieve topográfico y áreas naturales protegidas">
+          <i class="fa-solid fa-mountain-sun" style="color: #f59e0b;"></i> Topográfico
+        </button>
+        <button class="layer-pill-btn" data-layer="dark" title="Modo oscuro nocturno">
+          <i class="fa-solid fa-moon" style="color: #a855f7;"></i> Noche
+        </button>
+      </div>
+
+      <!-- Barra de Narración y Reproductor de Voz de Cami -->
+      <div class="voice-player-bar-container" id="voice-player-bar">
+        <div class="voice-identity-col">
+          <div class="voice-avatar-thumb">
+            <img src="assets/cami-logo.jpg" alt="Cami" class="avatar-shrimp-img">
+          </div>
+          <div>
+            <div class="voice-agent-title">Asistente de Voz Cami</div>
+            <div class="voice-agent-status">Narrando recorrido</div>
+          </div>
+        </div>
+
+        <div class="voice-wave-visualizer" id="voice-wave-anim">
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="voice-subtitles-marquee" id="voice-subtitles-text">
+          "Bienvenido a Ciudad del Carmen. Iniciando recorrido por la isla..."
+        </div>
+
+        <div class="voice-player-buttons">
+          <button class="btn-voice-ctrl" id="voice-btn-playpause" title="Pausar / Reanudar">
+            <i class="fa-solid fa-pause"></i>
+          </button>
+          <button class="btn-voice-ctrl" id="voice-btn-stop" title="Detener voz">
+            <i class="fa-solid fa-square"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           BLOQUE INFERIOR DERECHO: SOLICITUDES DEL USUARIO (Estilo Imagen 1)
+           Reemplaza el bloque de saludo de la Imagen 2 como solicitó el usuario
+           ===================================================================== -->
+      <div class="user-requests-floating-panel" id="user-requests-card">
+
+        <!-- Encabezado del Panel -->
+        <div class="requests-panel-header">
+          <div class="requests-panel-title-wrap">
+            <div class="shrimp-badge-icon">
+              <img src="assets/cami-logo.jpg" alt="Mascota Cami">
+            </div>
+            <span class="requests-panel-title">Planificador de Recorridos con IA</span>
+          </div>
+          <div class="requests-header-actions">
+            <button class="btn-header-tool" id="btn-toggle-requests-panel" title="Minimizar / Expandir">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Contenido Scrolleable del Formulario (Imagen 1) -->
+        <div class="requests-panel-scrollable">
+
+          <!-- 1. Bloque de Clima: "El clima ya va en tu plan" -->
+          <div class="plan-weather-box">
+            <div class="plan-weather-top-row">
+              <span class="plan-weather-title">El clima ya va en tu plan</span>
+              <button class="btn-plan-refresh btn-refresh-weather" title="Actualizar datos meteorológicos">
+                <i class="fa-solid fa-arrows-rotate"></i> Actualizar
+              </button>
+            </div>
+
+            <div class="plan-weather-headline">
+              <span class="plan-headline-temp" id="plan-weather-temp">31 °C · Carmen</span>
+              <span class="plan-headline-metrics" id="plan-weather-metrics">Sensación 36 °C · Viento 12.1 km/h · Modelo 13:30 · Consulta en tiempo real</span>
+            </div>
+
+            <!-- Banner de Recomendación para la Salud (Requisito Explícito) -->
+            <div id="plan-health-banner">
+              <div class="health-banner-box banner-warning">
+                <div class="banner-icon-col"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="banner-text-col">
+                  <strong>☀️ Índice UV Muy Alto: Usar bloqueador FPS 50+</strong>
+                  <p>Radiación solar intensa en Carmen. Aplica protector cada 2 horas, usa lentes de sol con filtro UV y mantente hidratado.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Carrusel de Pronóstico Horario con Probabilidad de Lluvia (Imagen 1) -->
+            <div class="plan-hourly-scroll" id="plan-hourly-cards">
+              <!-- Cargado dinámicamente -->
+            </div>
+
+            <!-- Selector de Escenarios de Demostración -->
+            <div class="demo-scenario-row">
+              <span class="demo-scenario-label"><i class="fa-solid fa-play"></i> Probar escenarios para la demostración:</span>
+              <select class="demo-scenario-select" id="demo-scenario-select">
+                <option value="auto">📡 Clima Real Carmen (Open-Meteo)</option>
+                <option value="sunny">☀️ Soleado extremo (Alerta UV y Bloqueador)</option>
+                <option value="rainy">🌧️ Chubascos (Peligro de lluvias e interiores)</option>
+                <option value="windy">💨 Viento Norte costero (Precaución en playa)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 2. Pregunta: "¿Cuánto tiempo tienes?" -->
+          <div class="request-question-group">
+            <label class="question-title">¿Cuánto tiempo tienes?</label>
+            <div class="pills-horizontal-row">
+              <button class="time-pill-btn" data-hours="1.5">1 hora y media</button>
+              <button class="time-pill-btn active" data-hours="3">3 horas</button>
+              <button class="time-pill-btn" data-hours="6">6 horas</button>
+            </div>
+          </div>
+
+          <!-- 3. Pregunta: "¿Qué te late?" (Píldoras multi-selección) -->
+          <div class="request-question-group">
+            <label class="question-title">¿Qué te late?</label>
+            <div class="interest-pills-wrap">
+              <button class="interest-pill-btn active" data-cat="historia"><i class="fa-solid fa-landmark"></i> Historia</button>
+              <button class="interest-pill-btn active" data-cat="playa"><i class="fa-solid fa-umbrella-beach"></i> Playa</button>
+              <button class="interest-pill-btn active" data-cat="comida"><i class="fa-solid fa-utensils"></i> Comida</button>
+              <button class="interest-pill-btn" data-cat="naturaleza"><i class="fa-solid fa-leaf"></i> Naturaleza</button>
+              <button class="interest-pill-btn" data-cat="familia"><i class="fa-solid fa-people-roof"></i> Familia</button>
+              <button class="interest-pill-btn" data-cat="negocios"><i class="fa-solid fa-bag-shopping"></i> Apoyar negocios locales</button>
+            </div>
+          </div>
+
+          <!-- 4. Salida y Punto de partida -->
+          <div class="departure-inputs-grid">
+            <div class="input-field-wrap">
+              <label class="input-label-sm">Salida (hora de Carmen)</label>
+              <input type="time" class="custom-time-input" id="departure-time-input" value="15:00">
+            </div>
+
+            <div class="input-field-wrap">
+              <label class="input-label-sm">Punto de partida</label>
+              <select class="custom-select-input" id="departure-point-select">
+                <option value="parque_zaragoza">Salida: Parque Zaragoza</option>
+                <option value="gps">📍 Mi ubicación GPS en tiempo real</option>
+                <option value="playa_norte">Playa Norte (Monumento al Camarón)</option>
+                <option value="malecon_costero">Malecón de la Caleta (Stella Maris)</option>
+                <option value="mercado_afa">Mercado Alonso Felipe de Andrade</option>
+                <option value="puente_zacatal">Entrada Puente El Zacatal</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 5. Botones Auxiliares de Imagen 1 -->
+          <div class="aux-action-buttons-grid">
+            <button class="btn-aux-tool" id="btn-reorganize">
+              <i class="fa-solid fa-rotate"></i> Reorganizar pendientes
+            </button>
+            <button class="btn-aux-tool" id="btn-save-route">
+              <i class="fa-solid fa-download"></i> Guardar recorrido
+            </button>
+            <button class="btn-aux-tool" id="btn-export-gpx">
+              <i class="fa-solid fa-location-arrow"></i> Trayecto GPX
+            </button>
+            <button class="btn-aux-tool" id="btn-toggle-contrast">
+              <i class="fa-solid fa-circle-half-stroke"></i> Cambiar contraste
+            </button>
+          </div>
+
+          <!-- 6. Botón Principal de Imagen 1: ¡Arma mi recorrido! -->
+          <button class="btn-cta-armar-recorrido" id="btn-build-route">
+            ¡Arma mi recorrido!
+          </button>
+
+          <!-- 7. Botón de Recorrido Virtual con Voz Asistida -->
+          <button class="btn-virtual-tour-launch" id="btn-start-virtual-tour">
+            <i class="fa-solid fa-headphones"></i> Iniciar Recorrido Virtual con Voz
+          </button>
+
+          <!-- 8. Detalle del Itinerario Generado por IA -->
+          <div class="itinerary-stops-wrapper" id="route-stops-list-container">
+            <!-- Inyectado dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Pie de Resumen (Imagen 1) -->
+        <div class="requests-footer-bar" id="route-summary-footer-bar">
+          <div class="summary-text-line">
+            <i class="fa-solid fa-shoe-prints"></i>
+            <strong>Cargando paradas...</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       DRAWER DEL CHATBOT CAMI (Mascota Camarón + IA Gemma)
+       ========================================================================= -->
+  <aside class="chatbot-drawer" id="cami-chatbot-drawer">
+    <div class="chatbot-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar-ring">
+          <img src="assets/cami-logo.jpg" alt="Cami" class="avatar-shrimp-img">
+        </div>
+        <div class="chat-title-group">
+          <h3>Chatbot Cami</h3>
+          <span>Conectada con IA Gemma</span>
+        </div>
+      </div>
+      <button class="btn-icon-subtle chat-btn-close" title="Cerrar chat">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="chat-messages-container"></div>
+
+    <!-- Chips Sugeridos -->
+    <div class="chat-quick-suggestions">
+      <button class="quick-suggestion-chip" data-query="¿Qué hay en el Museo Victoriano Niévares?">🏛️ Museo Victoriano Niévares</button>
+      <button class="quick-suggestion-chip" data-query="¿Cómo es Playa Bahamitas y qué llevar?">🏖️ Playa Bahamitas</button>
+      <button class="quick-suggestion-chip" data-query="¿Dónde comer los mejores camarones al coco?">🍤 Camarones al coco</button>
+      <button class="quick-suggestion-chip" data-query="Cuéntame del quiosco morisco del Parque Zaragoza">🌲 Parque Zaragoza y Quiosco</button>
+      <button class="quick-suggestion-chip" data-query="¿Cómo ir a ver los delfines en la Laguna de Términos?">🐬 Delfines en la laguna</button>
+      <button class="quick-suggestion-chip" data-query="Cuéntame la historia de los piratas en la Isla de Tris">🏴‍☠️ Historia pirata</button>
+      <button class="quick-suggestion-chip" data-query="¿Qué es el pan de cazón campechano?">🍲 Pan de cazón</button>
+      <button class="quick-suggestion-chip" data-query="¿Qué ropa y cuidados recomiendas para hoy?">☀️ Clima y salud hoy</button>
+    </div>
+
+    <!-- Entrada de Texto y Voz -->
+    <div class="chat-input-row">
+      <input type="text" class="chat-input-text" placeholder="Pregúntale a Cami sobre lugares, comida...">
+      <button class="chat-btn-mic" title="Hablar por micrófono"><i class="fa-solid fa-microphone"></i></button>
+      <button class="chat-btn-send" title="Enviar mensaje"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
+       MODAL DE CONFIGURACIÓN DE INTEGRACIÓN CON GEMMA 4 API
+       ========================================================================= -->
+  <div class="modal-backdrop" id="gemma-settings-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-brain" style="color: var(--gold-accent)"></i> Configuración Gemma 4 & API</h3>
+        <button class="btn-icon-subtle" id="btn-close-gemma-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+          Conecta la aplicación web con tu instancia local de <strong>Gemma 4</strong> (vía Ollama, vLLM, OpenAI API o HuggingFace). Si el servidor no está encendido, Cami usará automáticamente su motor heurístico local con datos reales de Ciudad del Carmen.
+        </p>
+
+        <div class="modal-field-group">
+          <label>Tipo de Proveedor / API</label>
+          <select id="select-gemma-type">
+            <option value="ollama">Ollama API (Recomendado para Gemma 4 local)</option>
+            <option value="openai">OpenAI-compatible (/v1/chat/completions)</option>
+            <option value="gemini">Google Gemini / Gemma API</option>
+          </select>
+        </div>
+
+        <div class="modal-field-group">
+          <label>URL del Endpoint API</label>
+          <input type="text" id="input-gemma-url" value="http://localhost:11434/api/generate">
+        </div>
+
+        <div class="modal-field-group">
+          <label>Nombre del Modelo</label>
+          <input type="text" id="input-gemma-model" value="gemma4">
+        </div>
+
+        <div class="modal-field-group">
+          <label>API Key (Opcional para Ollama local)</label>
+          <input type="password" id="input-gemma-key" placeholder="Dejar vacío si no requiere token">
+        </div>
+
+        <div id="gemma-conn-status"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btn-test-gemma-conn">
+          <i class="fa-solid fa-bolt"></i> Probar Conexión
+        </button>
+        <button class="btn-primary-modal" id="btn-save-gemma-config">
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Aplicación Cami (Módulo ES6) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
