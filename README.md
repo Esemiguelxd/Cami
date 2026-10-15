@@ -2,6 +2,12 @@
 
 **Cami** es una aplicación web interactiva diseñada para realizar recorridos turísticos inteligentes y personalizados en **Ciudad del Carmen, Campeche**. La app integra cálculo de rutas en tiempo real asistido por **Gemma 4**, seguimiento de ubicación GPS en vivo, asistente de voz interactivo para audio-guías culturales, pronóstico del clima automático con recomendaciones para la salud y un chatbot conversacional para conocer la historia, gastronomía de camarones y atractivos de la isla.
 
+Integrantes: 
+Miguel Ángel Jiménez May
+Jose Emanuel acencio Pérez
+Luis Angel Barrientos Payro
+Axel Farid Canul Avilez
+Alessandro Farid Vázquez Cortes
 ---
 
 ## 🌟 Características Principales
